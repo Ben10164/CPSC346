@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 struct node
 {
     int data;
@@ -9,7 +10,7 @@ struct node
 struct node *append(struct node *head, int data)
 {
     // First we are creating the new node that will be appended to the list
-    struct node *newNode = NULL;
+    struct node *newNode = malloc(sizeof(struct node)); // malloc is used to allocate the memory with a size of the node struct
     newNode->data = data;
     newNode->next = NULL;
 
@@ -27,12 +28,44 @@ struct node *append(struct node *head, int data)
         // at this point we have reach the final node, so we append the new node to the end by setting the final nodes next pointer to the new node
         iterator->next = newNode;
     }
-    
+
     // now we return the head
     return head;
 }
 
-int count(struct node *head)
+int listContainsNumber(struct node *head, int num)
+{
+    struct node *iterator = head;
+    while (iterator != NULL)
+    {
+        if (iterator->data == num)
+        {
+            return 1;
+        }
+        iterator = iterator->next;
+    }
+    return 0;
+}
+
+struct node *makeRandomListNoRepeats(int size)
+{
+    int i;
+    struct node *temp = malloc(sizeof(struct node));
+
+    for (i = 0; i < size - 1; i++)
+    {
+        int num = rand() % size;
+        while (listContainsNumber(temp, num) == 1) // making sure that the new number is not already in the list
+        {
+            num = rand() % size;
+        }
+        temp = append(temp, num);
+    }
+    return temp;
+}
+
+// this function will be used when dividing the list in halves during the merge sorting
+int count(struct node *head) 
 {
     int count = 0;
     struct node *iterator = head;
@@ -44,16 +77,18 @@ int count(struct node *head)
     return count;
 }
 
+void printList(struct node *head)
+{
+    struct node *iterator = head;
+    while (iterator != NULL)
+    {
+        printf("%d\n", iterator->data);
+        iterator = iterator->next;
+    }
+}
+
 int main()
 {
-    printf("Hello, World!");
-
-    // node *head = malloc(sizeof(node));
-    struct node *head = malloc(sizeof(struct node));
-    head->data = 10;
-    head->next = NULL;
-    struct node *nextnode = malloc(sizeof(struct node));
-    nextnode->data = 12;
-    nextnode->next = NULL;
-    head->next = nextnode;
+    struct node *head = makeRandomListNoRepeats(10);
+    printList(head);
 }

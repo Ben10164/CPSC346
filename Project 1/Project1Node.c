@@ -8,12 +8,18 @@ struct node
     struct node *next;
 };
 
-struct node *append(struct node *head, int data)
+struct node *node(int num)
+{
+    struct node *temp = malloc(sizeof(struct node));
+    temp->data = num;
+    temp->next = NULL;
+    return temp;
+}
+
+struct node *appendData(struct node *head, int data)
 {
     // First we are creating the new node that will be appended to the list
-    struct node *newNode = malloc(sizeof(struct node)); // malloc is used to allocate the memory with a size of the node struct
-    newNode->data = data;
-    newNode->next = NULL;
+    struct node *newNode = node(data);
 
     if (head == NULL) // If the list is empty (the head is null), we will just return the new node since it will be the head of the list
     {
@@ -27,6 +33,27 @@ struct node *append(struct node *head, int data)
             iterator = iterator->next;
         }
         // at this point we have reach the final node, so we append the new node to the end by setting the final nodes next pointer to the new node
+        iterator->next = newNode;
+    }
+    return head;
+}
+
+struct node *appendNode(struct node *head, struct node *newNode)
+{
+    if (head == NULL)
+    {
+        head = newNode;
+    }
+    else
+    {
+        struct node *iterator = head;
+        while (iterator->next != NULL)
+        {
+            iterator = iterator->next;
+        }
+        // at this point we have reach the final node,
+        // so since we are appending a node (possibly one with many nodes following it),
+        // we just set the next value of the node to equal this newNode
         iterator->next = newNode;
     }
     return head;
@@ -58,13 +85,13 @@ struct node *makeRandomListNoRepeats(int size)
         {
             num = rand() % size;
         }
-        temp = append(temp, num);
+        temp = appendData(temp, num);
     }
     return temp;
 }
 
 // this function will be used when dividing the list in halves during the merge sorting
-int count(struct node *head) 
+int count(struct node *head)
 {
     int count = 0;
     struct node *iterator = head;
@@ -86,3 +113,34 @@ void printList(struct node *head)
     }
 }
 
+// this is the function that merges the two lists, it assumes both lists are already sorted
+struct node *merge(struct node *left, struct node *right)
+{
+    struct node *leftIterator = left;
+    struct node *rightIterator = right;
+    struct node *newHead = NULL;
+
+    while (leftIterator != NULL && rightIterator != NULL)
+    {
+        if (leftIterator->data > rightIterator->data)
+        {
+            newHead = appendData(newHead, rightIterator->data);
+            rightIterator = rightIterator->next;
+        }
+        else
+        {
+            newHead = appendData(newHead, leftIterator->data);
+            leftIterator = leftIterator->next;
+        }
+    }
+    // at this point, one of the lists ran out of stuff to use, so we just append the other list
+    if (leftIterator == NULL)
+    {
+        newHead = appendNode(newHead, rightIterator);
+    }
+    else
+    {
+        newHead = appendNode(newHead, leftIterator);
+    }
+    return newHead;
+}

@@ -27,5 +27,10 @@ void testMerge()
 
 int main()
 {
-    testMerge();
+    // testMerge();
+    struct node *randomList = makeRandomListNoRepeats(9);
+    //printList(randomList);
+    //struct node *test = mergeSort(randomList, count(randomList));
+    struct node *test = mergeSort(randomList);
+    printList(test);
 }

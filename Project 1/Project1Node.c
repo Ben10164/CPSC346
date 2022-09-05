@@ -10,6 +10,7 @@ struct node
 
 struct node *node(int num)
 {
+    // struct node *temp = malloc(sizeof(struct node));
     struct node *temp = malloc(sizeof(struct node));
     temp->data = num;
     temp->next = NULL;
@@ -90,7 +91,7 @@ struct node *makeRandomListNoRepeats(int size)
     return temp;
 }
 
-// this function will be used when dividing the list in halves during the merge sorting
+// returns the count of a linked list
 int count(struct node *head)
 {
     int count = 0;
@@ -103,6 +104,7 @@ int count(struct node *head)
     return count;
 }
 
+// function for printing a linked list 
 void printList(struct node *head)
 {
     struct node *iterator = head;
@@ -113,7 +115,7 @@ void printList(struct node *head)
     }
 }
 
-// this is the function that merges the two lists, it assumes both lists are already sorted
+// this is a function that merges two linked lists (it assumes both lists are already sorted)
 struct node *merge(struct node *left, struct node *right)
 {
     struct node *leftIterator = left;
@@ -143,4 +145,39 @@ struct node *merge(struct node *left, struct node *right)
         newHead = appendNode(newHead, leftIterator);
     }
     return newHead;
+}
+
+// this is a function that performs merge sort on a linked list
+struct node *mergeSort(struct node *head)
+{
+    int size = count(head);
+    // if the list/sublist only contains 1 item, then its already sorted
+    if (size == 1)
+    {
+        return head;
+    }
+
+    // now we are splitting the list into the two equal halves that we will be passing in
+    // first we will save the head of the first half (we will change the ending of this half to be null later)
+    struct node *leftHead = head;
+    // now we make the iterator that will be used to go through the list to find the second half
+    struct node *iterator = head;
+    // we only go to the middle - 1, because we are going to set the value of the middle -1's next to be null
+    for (int i = 0; i < (int)(size / 2) - 1; i++)
+    {
+        iterator = iterator->next;
+    }
+    // before we set this node to null, we should save the next node as the head of the second list
+    struct node *rightHead = iterator->next;
+    // now we end the first list by setting the final nodes next value to null
+    iterator->next = NULL;
+
+    // recursion!
+    struct node *sortedLeft = mergeSort(leftHead);
+    struct node *sortedRight = mergeSort(rightHead);
+
+    // now we do the merge part of merge sort
+    struct node *sortedList = merge(sortedLeft, sortedRight);
+
+    return sortedList;
 }

@@ -12,7 +12,7 @@ struct node *makeRandomListNoRepeats(int size);
 
 void printList(struct node *head);
 int count(struct node *head);
-struct node *node(int num); // constructor 
+struct node *node(int num); // constructor
 struct node *appendNode(struct node *head, struct node *newNode);
 struct node *merge(struct node *left, struct node *right);
 struct node *mergeSort(struct node *head, int size);
@@ -173,7 +173,7 @@ struct node *mergeSort(struct node *head, int size)
 
     // recursion!
     struct node *sortedLeft = mergeSort(leftHead, count(leftHead));
-    struct node *sortedRight = mergeSort(rightHead,count(rightHead));
+    struct node *sortedRight = mergeSort(rightHead, count(rightHead));
 
     // now we do the merge part of merge sort
     struct node *sortedList = merge(sortedLeft, sortedRight);

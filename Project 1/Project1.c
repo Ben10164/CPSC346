@@ -153,6 +153,11 @@ struct node *merge(struct node *left, struct node *right)
 // this is a function that performs merge sort on a linked list
 struct node *mergeSort(struct node *head, int size)
 {
+    // check to see if it is null
+    if(head == NULL){
+        return head;
+    }
+
     // if the list/sublist only contains 1 item, then its already sorted
     if (size == 1)
     {
@@ -179,9 +184,11 @@ struct node *mergeSort(struct node *head, int size)
 
         printf("%s","Left head: ");
         printf("%d\n",leftHead->data);
+        printList(leftHead);
 
         printf("%s","Right head: ");
         printf("%d\n",rightHead->data);
+        printList(rightHead);
     */
 
     // recursion!

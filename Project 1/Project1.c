@@ -7,6 +7,7 @@ struct node
     struct node *next;
 };
 
+// functions for creating the list
 int listContainsNumber(struct node *head, int num);
 struct node *makeRandomListNoRepeats(int size);
 
@@ -20,11 +21,12 @@ struct node *mergeSort(struct node *head, int size);
 int main()
 {
     // testMerge();
-    struct node *randomList = makeRandomListNoRepeats(9);
-    // printList(randomList);
-    // struct node *test = mergeSort(randomList, count(randomList));
-    struct node *test = mergeSort(randomList, count(randomList));
-    printList(test);
+    struct node *unsortedList = makeRandomListNoRepeats(9);
+    printf("%s", "Unsorted: ");
+    printList(unsortedList);
+    printf("%s", "Sorted: ");
+    struct node *sortedList = mergeSort(unsortedList, count(unsortedList));
+    printList(unsortedList);
 }
 
 struct node *node(int num)
@@ -85,9 +87,10 @@ void printList(struct node *head)
     struct node *iterator = head;
     while (iterator != NULL)
     {
-        printf("%d\n", iterator->data);
+        printf("%d ", iterator->data);
         iterator = iterator->next;
     }
+    printf("\n");
 }
 
 // fucntion used to append a node to the end of a list
@@ -170,6 +173,16 @@ struct node *mergeSort(struct node *head, int size)
     struct node *rightHead = iterator->next;
     // now we end the first list by setting the final nodes next value to null
     iterator->next = NULL;
+
+    // Uncomment for outputting the left and right heads during the algorithm
+    /*
+
+        printf("%s","Left head: ");
+        printf("%d\n",leftHead->data);
+
+        printf("%s","Right head: ");
+        printf("%d\n",rightHead->data);
+    */
 
     // recursion!
     struct node *sortedLeft = mergeSort(leftHead, count(leftHead));

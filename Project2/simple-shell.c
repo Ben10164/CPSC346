@@ -87,20 +87,25 @@ int setup(char inputBuffer[], char *args[],int *background)
 	/**
 	 * Parse the contents of inputBuffer
 	 */
-	
+    int argc = 0;
+
     for (i=0;i<length;i++) { 
 		/* examine every character in the inputBuffer */
 		
         switch (inputBuffer[i]){
 			case ' ':
+                argc ++;
 			case '\t' : /* argument separators */
-				//fill in your code here, set up args				
-
+				//fill in your code here, set up args	
+                argc ++;			
+                break;
 				
 			case '\n':  /* should be the final char examined */
 				//fill in your code here, set up the last item args[x] ==NULL;
 				/* no more arguments to this command */	
-
+                argc ++;
+                args[argc] = NULL;
+                break;
 				
 	    	default :             /* some other character */
 				 //fill in your code here, 
@@ -109,13 +114,19 @@ int setup(char inputBuffer[], char *args[],int *background)
 				* The location is the first character, which is not '\t', not '\t', and not '\n'
 				* You also need check "&". If '&' is detected, setup background flag.
 				*/ 
-
-                if(1){
-
+                // args[argc] =  strncat(args[argc], &inputBuffer[i], 1);
+                if (strlen(args[argc]) <= 13) {
+                    args[argc] = &inputBuffer[i];
+                }else{
+                    char* concated = strncat(args[argc], &inputBuffer[i], 1);
+                    args[argc] = concated;
                 }
 		} /* end of switch */
 	}    /* end of for */
-	
+    printf("argc = %d\n", argc);
+    for (i = 0; i < argc; i++) {
+        printf("args[%d] = %s", i, args[i]);
+    }
 	/**
 	 * Here you finish parsing the input. 
 	 * There is one more thing to assure. If we get '&', make sure you don't enter it in the args array

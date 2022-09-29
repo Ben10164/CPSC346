@@ -96,11 +96,11 @@ int setup(char inputBuffer[], char *args[], int *background)
         switch (inputBuffer[i])
         {
         case ' ':
+            // TODO
             break;
-        case '\t': /* argument separators */
-                   // fill in your code here, set up args
-            inWord = 0;
-            argc++;
+        case '\t':      /* argument separators */
+            inWord = 0; // we are not in a word anymore, so set inWord to 0
+            argc++;     // increment the number of arguments
             break;
 
         case '\n': /* should be the final char examined */
@@ -117,31 +117,29 @@ int setup(char inputBuffer[], char *args[], int *background)
              * The location is the first character, which is not '\t', not '\t', and not '\n'
              * You also need check "&". If '&' is detected, setup background flag.
              */
+
             if (inputBuffer[i] == '&')
             {
+                // the inputBuffer[i] is '&', set up background flag
                 *background = 1;
             }
             else
             {
-                if (inWord == 0)
+                if (inWord == 0) // we are not "in a word", meaning we are at the start of a word
                 {
-                    firstLetter = inputBuffer[i];
-                    firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter));
-                    firstLetterString[0] = firstLetter;
-                    args[argc] = firstLetterString;
-                    inWord = 1;
+                    firstLetter = inputBuffer[i];                                            // store the first letter of the word
+                    firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter)); // allocate memory for the first letter as an "array" of chars
+                    firstLetterString[0] = firstLetter;                                      // store the first letter in the "array"
+                    args[argc] = firstLetterString;                                          // store the "array" in the args array
+                    inWord = 1;                                                              // we are now in a word, so we set inWord to 1
                 }
                 else
                 {
-                    letter = inputBuffer[i];
-                    // add the char temp to the string args[argc]
-                    // char* temp2 = args[argc];
-                    // create temp2, which is args[argc], but use malloc
-                    concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc]));
-                    strcpy(concatedArg, args[argc]);
-                    // add temp to temp2
-                    concatedArg[strlen(concatedArg)] = letter;
-                    args[argc] = concatedArg;
+                    letter = inputBuffer[i];                                         // store the letter
+                    concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
+                    strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
+                    concatedArg[strlen(concatedArg)] = letter;                       // add the new letter to the end of concatedArg
+                    args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
                 }
             }
 
@@ -156,7 +154,8 @@ int setup(char inputBuffer[], char *args[], int *background)
      * Here you finish parsing the input.
      * There is one more thing to assure. If we get '&', make sure you don't enter it in the args array
      */
-    memset(args, 0, sizeof args[0] * argc);
+
+    memset(args, 0, sizeof args[0] * argc); // clear the args array
     return 1;
 
 } /* end of setup routine */

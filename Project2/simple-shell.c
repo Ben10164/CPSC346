@@ -82,8 +82,14 @@ int setup(char inputBuffer[], char *args[], int *background)
     /**
      * Parse the contents of inputBuffer
      */
-    int argc = 0;
-    int inword = 0;
+
+    int argc = 0;            // the number of arguments
+    int inWord = 0;          // "bool" to indicate if we are in a word or not
+    char firstLetter;        // used to store the first letter of an argument (format: char)
+    char letter;             // used to store the first letter of an argument that is not the first letter (format: char)
+    char *firstLetterString; // used to store the first letter of an argument (format: char*)
+    char *concatedArg;       // used to store the argument before and after concatenation
+
     for (i = 0; i < length; i++)
     {
         /* examine every character in the inputBuffer */
@@ -93,7 +99,7 @@ int setup(char inputBuffer[], char *args[], int *background)
             break;
         case '\t': /* argument separators */
                    // fill in your code here, set up args
-            inword = 0;
+            inWord = 0;
             argc++;
             break;
 
@@ -117,25 +123,25 @@ int setup(char inputBuffer[], char *args[], int *background)
             }
             else
             {
-                if (inword == 0)
+                if (inWord == 0)
                 {
-                    char firstLetter = inputBuffer[i];
-                    char *firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter));
+                    firstLetter = inputBuffer[i];
+                    firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter));
                     firstLetterString[0] = firstLetter;
                     args[argc] = firstLetterString;
-                    inword = 1;
+                    inWord = 1;
                 }
                 else
                 {
-                    char letter = inputBuffer[i];
+                    letter = inputBuffer[i];
                     // add the char temp to the string args[argc]
                     // char* temp2 = args[argc];
                     // create temp2, which is args[argc], but use malloc
-                    char *temp2 = (char *)malloc(sizeof(char) * strlen(args[argc]));
-                    strcpy(temp2, args[argc]);
+                    concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc]));
+                    strcpy(concatedArg, args[argc]);
                     // add temp to temp2
-                    temp2[strlen(temp2)] = letter;
-                    args[argc] = temp2;
+                    concatedArg[strlen(concatedArg)] = letter;
+                    args[argc] = concatedArg;
                 }
             }
 

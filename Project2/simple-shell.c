@@ -94,13 +94,14 @@ int setup(char inputBuffer[], char *args[], int *background)
         case '\t': /* argument separators */
                    // fill in your code here, set up args
             inword = 0;
+            argc++;
             break;
 
         case '\n': /* should be the final char examined */
                    // fill in your code here, set up the last item args[x] ==NULL;
             /* no more arguments to this command */
             argc++;
-            args[argc] = NULL;
+            args[argc] = "\0";
             break;
 
         default: /* some other character */
@@ -113,18 +114,30 @@ int setup(char inputBuffer[], char *args[], int *background)
             if (inputBuffer[i] == '&')
             {
                 *background = 1;
-                inputBuffer[i] = '\0';
             }
             else
             {
                 if (inword == 0)
                 {
-                    args[argc] = &inputBuffer[i];
-                    argc++;
+                    char firstLetter = inputBuffer[i];
+                    char *firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter));
+                    firstLetterString[0] = firstLetter;
+                    args[argc] = firstLetterString;
                     inword = 1;
                 }
+                else
+                {
+                    char letter = inputBuffer[i];
+                    // add the char temp to the string args[argc]
+                    // char* temp2 = args[argc];
+                    // create temp2, which is args[argc], but use malloc
+                    char *temp2 = (char *)malloc(sizeof(char) * strlen(args[argc]));
+                    strcpy(temp2, args[argc]);
+                    // add temp to temp2
+                    temp2[strlen(temp2)] = letter;
+                    args[argc] = temp2;
+                }
             }
-            break;
 
         } /* end of switch */
     }     /* end of for */
@@ -137,7 +150,7 @@ int setup(char inputBuffer[], char *args[], int *background)
      * Here you finish parsing the input.
      * There is one more thing to assure. If we get '&', make sure you don't enter it in the args array
      */
-
+    memset(args, 0, sizeof args[0] * argc);
     return 1;
 
 } /* end of setup routine */

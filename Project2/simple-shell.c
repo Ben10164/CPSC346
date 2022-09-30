@@ -42,12 +42,14 @@ void addtohistory(char inputBuffer[])
     return;
 }
 
-/**
- * The setup function below will not return any value, but it will just: read
- * in the next command line; separate it into distinct arguments (using blanks as
- * delimiters), and set the args array entries to point to the beginning of what
- * will become null-terminated, C-style strings.
- */
+void displayhistory()
+{
+    int i;
+    for (i = 0; i < command_count; i++)
+    {
+        printf("%d: %s\n", i, display_history[i]);
+    }
+}
 
 int setup(char inputBuffer[], char *args[], int *background)
 {
@@ -79,20 +81,32 @@ int setup(char inputBuffer[], char *args[], int *background)
      * Check if they are using history
      */
 
-    // fill in your code here Part II, if the user input is to repeat some history commands
     if (inputBuffer[0] == '!')
     {
-        int i;
-        for (i = 0; i < command_count; i++)
+        if (inputBuffer[1] != '\n')
         {
-            printf("%d %s\n", i, display_history[i]);
+            command_number = atoi(&inputBuffer[1]);
+            if (command_number < command_count)
+            {
+                printf("You are repeating command %d: %s\n", command_number, display_history[command_number]);
+                strcpy(inputBuffer, history[command_number]);
+            }
+            else
+            {
+                printf("Command not found in history. Pick one of these:\n");
+                displayhistory();
+            }
+        }
+        else
+        {
+            displayhistory();
         }
     }
     else
     {
         // if it doesnt start with a !, then it is a normal command, so we add it to history
-        addtohistory(inputBuffer);
         // note how we dont add the history command to history, so it doesnt clutter up the history and you could repeat it with the same result
+        addtohistory(inputBuffer);
     }
 
     /**
@@ -124,7 +138,7 @@ int setup(char inputBuffer[], char *args[], int *background)
             argc++;                                                          // increment the number of arguments
             break;
 
-        case '\n': /* should be the final char examined */
+        case '\n':                                                           /* should be the final char examined */
             letter = '\0';                                                   // store the letter
             concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
             strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
@@ -135,13 +149,6 @@ int setup(char inputBuffer[], char *args[], int *background)
             break;
 
         default: /* some other character */
-                 // fill in your code here,
-            /* args[i] is a pointer to a string, its value is the address of the first charater of that string
-             * You want to track the location of the beginning character of each string.
-             * The location is the first character, which is not '\t', not '\t', and not '\n'
-             * You also need check "&". If '&' is detected, setup background flag.
-             */
-
             if (inputBuffer[i] == '&')
             {
                 // the inputBuffer[i] is '&', set up background flag
@@ -169,6 +176,7 @@ int setup(char inputBuffer[], char *args[], int *background)
 
         } /* end of switch */
     }     /* end of for */
+
     /*
     for (int as = 0; as < argc; as++)
     {
@@ -177,19 +185,7 @@ int setup(char inputBuffer[], char *args[], int *background)
     }
     */
 
-    /**
-     * Here you finish parsing the input.
-     * There is one more thing to assure. If we get '&', make sure you don't enter it in the args array
-     */
-
-    //
-    //
-    //
-    // after everything is done!
-    for(int temp = 0; temp < MAX_LINE; temp ++){
-        // memset(inputBuffer[temp], 0, sizeof(inputBuffer[temp]) * MAX_LINE / 2 + 1); // clear the inputBuffer array before use
-        inputBuffer[temp] = '\0';
-    }
+    memset(inputBuffer, 0, sizeof &inputBuffer); // clear the inputBuffer array before use
     return 1;
 
 } /* end of setup routine */
@@ -208,20 +204,24 @@ int main(void)
     while (shouldrun)
     { /* Program terminates normally inside setup */
         background = 0;
-        
-        shouldrun = setup(inputBuffer, args, &background); /* get next command */
-        // fill in your code here Part I
-        /* if the user typed in "exit", the shell program will return (or terminate).
-         * Call strncmp(str1,str1,count). The function call will return 0 if str1 == str2.
-         * "count" is the number of characters we use to compare.
-         */
 
-        // fill in your code here Part II
-        /* if the user typed in "history", the shell program will display the history commands.
-         * you will use "printf" to print the display_history
-         * after you display all the array, this command is done.
-         * Your program should go to read again, which means calling the "setup" function.
-         */
+        // reset the args array
+        for (int i = 0; i < MAX_LINE / 2 + 1; i++)
+        {
+            args[i] = NULL;
+        }
+        shouldrun = setup(inputBuffer, args, &background); /* get next command */
+
+        if (strncmp(args[0], "exit", 4) == 0)
+        {
+            return 0;
+        }
+
+        if (strncmp(args[0], "history", 7) == 0)
+        {
+            displayhistory();
+            continue;
+        }
 
         if (shouldrun) // if there is no error and can return 1
         {

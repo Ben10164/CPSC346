@@ -1,3 +1,3 @@
 default:
-	gcc Project1.c -o Project1
-	./Project1
+	gcc Project1.c
+	./a.out

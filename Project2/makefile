@@ -1,3 +1,3 @@
 default:
-	gcc simple-shell.c -o Project2
-	./Project2
+	gcc simple-shell.c 
+	./a.out

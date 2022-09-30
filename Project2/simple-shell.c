@@ -1,5 +1,6 @@
 /**
  *version control and author
+ *Ben Puryear
  */
 
 #include <stdio.h>
@@ -26,9 +27,18 @@ void addtohistory(char inputBuffer[])
 {
 
     // update array"history": add the command to history, strcpy(str1,str2);
-
+    strcpy(history[command_count % MAX_COMMANDS], inputBuffer);
     // update array"display_history": remove characters like '\n', '\0' in order to display nicely
-
+    strcpy(display_history[command_count % MAX_COMMANDS], inputBuffer);
+    // find and replace all \n with \0 (no clue how there would be more than 1 though, but better safe than sorry)
+    for (int i = 0; i < sizeof display_history[command_count % MAX_COMMANDS]; i++)
+    {
+        if (display_history[command_count][strlen(display_history[command_count]) - i] == '\n')
+        {
+            display_history[command_count][strlen(display_history[command_count]) - i] = '\0';
+        }
+    }
+    command_count++;
     return;
 }
 
@@ -41,6 +51,7 @@ void addtohistory(char inputBuffer[])
 
 int setup(char inputBuffer[], char *args[], int *background)
 {
+
     int length,         /* # of characters in the command line */
         i,              /* loop index for accessing inputBuffer array */
         command_number; /* index of requested command number */
@@ -69,15 +80,20 @@ int setup(char inputBuffer[], char *args[], int *background)
      */
 
     // fill in your code here Part II, if the user input is to repeat some history commands
-    /*if (inputBuffer[0] == '!') {
-
-    }*/
-
-    /**
-     * Add the command to the history
-     */
-    // fill in your code here Part II, add the following line for PartII
-    // addtohistory(inputBuffer);
+    if (inputBuffer[0] == '!')
+    {
+        int i;
+        for (i = 0; i < command_count; i++)
+        {
+            printf("%d %s\n", i, display_history[i]);
+        }
+    }
+    else
+    {
+        // if it doesnt start with a !, then it is a normal command, so we add it to history
+        addtohistory(inputBuffer);
+        // note how we dont add the history command to history, so it doesnt clutter up the history and you could repeat it with the same result
+    }
 
     /**
      * Parse the contents of inputBuffer
@@ -96,18 +112,26 @@ int setup(char inputBuffer[], char *args[], int *background)
         switch (inputBuffer[i])
         {
         case ' ':
-            // TODO
-            break;
-        case '\t':      /* argument separators */
-            inWord = 0; // we are not in a word anymore, so set inWord to 0
-            argc++;     // increment the number of arguments
+            // move onto default
+        case '\t': /* argument separators */
+
+            letter = '\0';                                                   // store the letter
+            concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
+            strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
+            concatedArg[strlen(concatedArg)] = letter;                       // add the new letter to the end of concatedArg
+            args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
+            inWord = 0;                                                      // we are not in a word anymore, so set inWord to 0
+            argc++;                                                          // increment the number of arguments
             break;
 
         case '\n': /* should be the final char examined */
-                   // fill in your code here, set up the last item args[x] ==NULL;
-            /* no more arguments to this command */
-            argc++;
-            args[argc] = "\0";
+            letter = '\0';                                                   // store the letter
+            concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
+            strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
+            concatedArg[strlen(concatedArg)] = letter;                       // add the new letter to the end of concatedArg
+            args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
+            inWord = 0;                                                      // we are not in a word anymore, so set inWord to 0
+            argc++;                                                          // increment the number of arguments
             break;
 
         default: /* some other character */
@@ -145,17 +169,27 @@ int setup(char inputBuffer[], char *args[], int *background)
 
         } /* end of switch */
     }     /* end of for */
+    /*
     for (int as = 0; as < argc; as++)
     {
         printf("args[%d] = %s", as, args[as]);
         printf("\n");
     }
+    */
+
     /**
      * Here you finish parsing the input.
      * There is one more thing to assure. If we get '&', make sure you don't enter it in the args array
      */
 
-    memset(args, 0, sizeof args[0] * argc); // clear the args array
+    //
+    //
+    //
+    // after everything is done!
+    for(int temp = 0; temp < MAX_LINE; temp ++){
+        // memset(inputBuffer[temp], 0, sizeof(inputBuffer[temp]) * MAX_LINE / 2 + 1); // clear the inputBuffer array before use
+        inputBuffer[temp] = '\0';
+    }
     return 1;
 
 } /* end of setup routine */
@@ -174,9 +208,8 @@ int main(void)
     while (shouldrun)
     { /* Program terminates normally inside setup */
         background = 0;
-
+        
         shouldrun = setup(inputBuffer, args, &background); /* get next command */
-
         // fill in your code here Part I
         /* if the user typed in "exit", the shell program will return (or terminate).
          * Call strncmp(str1,str1,count). The function call will return 0 if str1 == str2.
@@ -190,16 +223,17 @@ int main(void)
          * Your program should go to read again, which means calling the "setup" function.
          */
 
-        if (shouldrun)
+        if (shouldrun) // if there is no error and can return 1
         {
-            /* creates a duplicate process! */
-            // here fill in your code
-            /* pid<0  error
-             *  pid == 0, it is the child process. use the system call execvp(args[0],args);
-             *  pid > 0, it is the parent. Here you need consider it is foreground or background
-             */
-            // ;
-            // }
+            if ((child = fork()) == 0)
+            {
+                execvp(args[0], args);
+                exit(0); // kills the child
+            }
+            else if (!background)
+            { // parent
+                waitpid(child, 0, 0);
+            }
         }
     }
 

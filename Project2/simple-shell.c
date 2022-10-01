@@ -77,15 +77,20 @@ int setup(char inputBuffer[], char *args[], int *background)
         exit(-1); /* terminate with error code of -1 */
     }
 
-    /**
-     * Check if they are using history
-     */
-
+    // history handling
     if (inputBuffer[0] == '!')
     {
         if (inputBuffer[1] != '\n')
         {
-            command_number = atoi(&inputBuffer[1]);
+            if (inputBuffer[1] == '!')
+            {
+                command_number = 0;
+            }
+            else
+            {
+                // if the user enters anything not a number, command_number will be 0 (aka the most recent one)
+                command_number = atoi(&inputBuffer[1]);
+            }
             if (command_number < command_count)
             {
                 printf("You are repeating command %d: %s\n", command_number, display_history[command_number]);
@@ -106,14 +111,25 @@ int setup(char inputBuffer[], char *args[], int *background)
     {
         // if it doesnt start with a !, then it is a normal command, so we add it to history
         // note how we dont add the history command to history, so it doesnt clutter up the history and you could repeat it with the same result
-        addtohistory(inputBuffer);
+        if (strncmp(inputBuffer, "history", 7) == 0)
+        {
+            displayhistory();
+            return 1;
+        }
+        else if (strncmp(inputBuffer, "exit", 4) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            addtohistory(inputBuffer);
+        }
     }
 
-    /**
-     * Parse the contents of inputBuffer
-     */
+    // if the code has reached this point, then it is a normal command (not history or exit), so we can continue
+    // and if it was a !# command, it has already been replaced with the actual command
 
-    int argc = 0;            // the number of arguments
+    int argc = 0;            // th e number of arguments
     int inWord = 0;          // "bool" to indicate if we are in a word or not
     char firstLetter;        // used to store the first letter of an argument (format: char)
     char letter;             // used to store the first letter of an argument that is not the first letter (format: char)
@@ -148,7 +164,7 @@ int setup(char inputBuffer[], char *args[], int *background)
             argc++;                                                          // increment the number of arguments
             break;
 
-        default: /* some other character */
+        default:
             if (inputBuffer[i] == '&')
             {
                 // the inputBuffer[i] is '&', set up background flag
@@ -156,7 +172,8 @@ int setup(char inputBuffer[], char *args[], int *background)
             }
             else
             {
-                if (inWord == 0) // we are not "in a word", meaning we are at the start of a word
+                // if inWord is 0, we are not "in a word", meaning we are at the start of a word
+                if (inWord == 0) 
                 {
                     firstLetter = inputBuffer[i];                                            // store the first letter of the word
                     firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter)); // allocate memory for the first letter as an "array" of chars
@@ -173,22 +190,17 @@ int setup(char inputBuffer[], char *args[], int *background)
                     args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
                 }
             }
-
-        } /* end of switch */
-    }     /* end of for */
-
-    /*
-    for (int as = 0; as < argc; as++)
-    {
-        printf("args[%d] = %s", as, args[as]);
-        printf("\n");
+        }
     }
-    */
+
+    for (int as = 0; as <= argc; as++)
+    {
+        printf("args[%d] = %s\n", as, args[as]);
+    }
 
     memset(inputBuffer, 0, sizeof &inputBuffer); // clear the inputBuffer array before use
     return 1;
-
-} /* end of setup routine */
+}
 
 int main(void)
 {
@@ -197,31 +209,19 @@ int main(void)
     char *args[MAX_LINE / 2 + 1]; /* command line (of 80) has max of 40 arguments */
     pid_t child;                  /* process id of the child process */
 
-    // define your local variables here, at the beginning of your program.
-
     int shouldrun = 1;
 
     while (shouldrun)
-    { /* Program terminates normally inside setup */
+    {
         background = 0;
 
-        // reset the args array
+        // reset the args array so commands dont bleed into each other
         for (int i = 0; i < MAX_LINE / 2 + 1; i++)
         {
             args[i] = NULL;
         }
-        shouldrun = setup(inputBuffer, args, &background); /* get next command */
 
-        if (strncmp(args[0], "exit", 4) == 0)
-        {
-            return 0;
-        }
-
-        if (strncmp(args[0], "history", 7) == 0)
-        {
-            displayhistory();
-            continue;
-        }
+        shouldrun = setup(inputBuffer, args, &background);
 
         if (shouldrun) // if there is no error and can return 1
         {
@@ -231,7 +231,8 @@ int main(void)
                 exit(0); // kills the child
             }
             else if (!background)
-            { // parent
+            {
+                // parent waits for foreground job to terminate
                 waitpid(child, 0, 0);
             }
         }

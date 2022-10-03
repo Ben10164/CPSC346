@@ -45,6 +45,10 @@ void addtohistory(char inputBuffer[])
 void displayhistory()
 {
     int i;
+    if (command_count == 0)
+    {
+        printf("No commands in history.\n");
+    }
     for (i = 0; i < command_count; i++)
     {
         printf("%d: %s\n", i, display_history[i]);
@@ -154,14 +158,22 @@ int setup(char inputBuffer[], char *args[], int *background)
             argc++;                                                          // increment the number of arguments
             break;
 
-        case '\n':                                                           /* should be the final char examined */
-            letter = '\0';                                                   // store the letter
-            concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
-            strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
-            concatedArg[strlen(concatedArg)] = letter;                       // add the new letter to the end of concatedArg
-            args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
-            inWord = 0;                                                      // we are not in a word anymore, so set inWord to 0
-            argc++;                                                          // increment the number of arguments
+        case '\n': /* should be the final char examined */
+            letter = '\0';
+            if (args[argc] != NULL)
+            {
+
+                concatedArg = (char *)malloc(sizeof(char) * strlen(args[argc])); // allocate memory for the argument (plus the new letter)
+                strcpy(concatedArg, args[argc]);                                 // copy the argument into the new "array" called concatedArg
+                concatedArg[strlen(concatedArg)] = letter;                       // add the new letter to the end of concatedArg
+                args[argc] = concatedArg;                                        // store concatedArg in the args array, replacing the old incomplete argument
+                inWord = 0;                                                      // we are not in a word anymore, so set inWord to 0
+                argc++;                                                          // increment the number of arguments
+            }
+            else
+            {
+                args[argc] = NULL; // set the last argument to NULL
+            }                      
             break;
 
         default:
@@ -173,7 +185,7 @@ int setup(char inputBuffer[], char *args[], int *background)
             else
             {
                 // if inWord is 0, we are not "in a word", meaning we are at the start of a word
-                if (inWord == 0) 
+                if (inWord == 0)
                 {
                     firstLetter = inputBuffer[i];                                            // store the first letter of the word
                     firstLetterString = (char *)malloc(sizeof(char) * strlen(&firstLetter)); // allocate memory for the first letter as an "array" of chars
@@ -193,9 +205,9 @@ int setup(char inputBuffer[], char *args[], int *background)
         }
     }
 
-    for (int as = 0; as <= argc; as++)
+    for (int argument = 0; argument <= argc; argument++)
     {
-        printf("args[%d] = %s\n", as, args[as]);
+        printf("args[%d] = %s\n", argument, args[argument]);
     }
 
     memset(inputBuffer, 0, sizeof &inputBuffer); // clear the inputBuffer array before use

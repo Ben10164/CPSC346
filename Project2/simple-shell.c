@@ -88,7 +88,7 @@ int setup(char inputBuffer[], char *args[], int *background)
         {
             if (inputBuffer[1] == '!')
             {
-                command_number = 0;
+                command_number = command_count - 1;
             }
             else
             {
@@ -205,10 +205,11 @@ int setup(char inputBuffer[], char *args[], int *background)
         }
     }
 
-    for (int argument = 0; argument <= argc; argument++)
-    {
-        printf("args[%d] = %s\n", argument, args[argument]);
-    }
+    // for testing purposes
+    // for (int argument = 0; argument <= argc; argument++)
+    // {
+    //     printf("args[%d] = %s\n", argument, args[argument]);
+    // }
 
     memset(inputBuffer, 0, sizeof &inputBuffer); // clear the inputBuffer array before use
     return 1;

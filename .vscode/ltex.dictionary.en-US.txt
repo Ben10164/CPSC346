@@ -1,2 +1,9 @@
 ptr
 myid
+Tq
+Tq
+FCFS
+uniprocesors
+cnt
+$rsp
+$rip

@@ -113,16 +113,6 @@ int main(int argc, char *argv[])
     /* Sleep for user specified time */
     sleep(sleepTime);
 
-    while (producerThreads > 0)
-    {
-        producerThreads--;
-        pthread_join(producers[producerThreads], NULL);
-    }
-    while (consumerThreads > 0)
-    {
-        consumerThreads--;
-        pthread_join(consumers[consumerThreads], NULL);
-    }
     pthread_mutex_destroy(&buffer_mutex);
 
     sem_destroy(&empty_semaphore);

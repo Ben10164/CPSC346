@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <unistd.h>
 
 #define TRUE 1
 
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
 
     if (sem_init(&empty_semaphore, 0, BUFFER_SIZE) != 0 || sem_init(&occupied_semaphore, 0, 0) != 0)
     {
-        printf("Semaphore error\n");
+        printf("Semaphore error. Error also present if running on macOS. Please use ada\n");
         return -1;
     }
 

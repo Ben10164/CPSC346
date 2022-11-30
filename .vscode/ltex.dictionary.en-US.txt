@@ -7,3 +7,4 @@ uniprocesors
 cnt
 $rsp
 $rip
+inode
